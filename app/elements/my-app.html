@@ -1,0 +1,167 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: red;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+
+      paper-progress {
+        width: 100%;
+      }
+
+      paper-icon-button {
+        cursor: hand;
+      }
+
+    </style>
+
+    <app-location id="appLocation" route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+      <app-drawer id="appDrawer">
+        <paper-toolbar>Menu</paper-toolbar>
+        <iron-selector selected="{{page}}" attr-for-selected="name" class="drawer-list" role="navigation">
+          <paper-item name="news">ACTUALIDAD</paper-item>
+          <paper-item name="podcast">PODCAST</paper-item>
+          <paper-item name="tv">TV</paper-item>
+          <paper-item name="radio">RADIO</paper-item>
+          <paper-item name="contact">CONTACTO</paper-item>
+        </iron-selector>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+        <app-header condenses reveals effects="waterfall">
+          <paper-toolbar>
+            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <span class="title">www.mariskalrock.com</span>
+            <paper-icon-button hidden$="{{hideRefresh}}" icon="refresh" on-tap="refreshFeed"></paper-icon-button>   
+          </paper-toolbar>
+
+        </app-header>
+
+        <iron-pages
+            selected="{{page}}"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <mr-news name="news"></mr-news>
+          <mr-podcast name="podcast"></mr-podcast>
+          <mr-tv name="tv"></mr-tv>
+          <mr-radio name="radio"></mr-radio>
+          <mr-contact name="contact"></mr-contact>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
+
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged',
+          vaue: 'news'
+        },
+        showRefresh: {
+          type: Boolean,
+          computed: 'canShowRefresh(page)'
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
+      ready: function() {
+        moment.locale('es');
+        this.set('page', 'news');
+
+        // Register service worker if supported.
+        // if ('serviceWorker' in navigator) {
+        //   navigator.serviceWorker.register('..//scripts/service-worker.js');
+        // }
+      },
+
+      refreshFeed: function() {
+        console.log('develop refreshFeed');
+      },
+
+      hideShowRefresh: function(page) {
+        //TODO replace this workaround for a pull-refresh
+        return page !== 'contact' && page !== 'radio';
+      },
+
+      _routePageChanged: function(page) {
+        //FIXME workaround for android webview
+        page = (page === 'android_asset') ? 'news' : page;
+
+        if (!this.$.appDrawer.hasAttribute('persistent')) {
+          this.$.appDrawer.close();
+        }
+      },
+
+      _pageChanged: function(page) {
+        this.set('page', page || 'news');
+
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('mr-' + page + '/mr-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+        this.set('routeData', {'page': page});
+      },
+
+      _showPage404: function() {
+        this.page = 'view404';
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,74 @@
+
+
+<dom-module id="mr-podcast">
+  <template>
+      <style>
+        paper-spinner {
+          bottom: 50%;
+          position: absolute;
+          left: 50%;
+        }
+      </style>
+
+      <!--<pull-to-action action="location.reload()" container="iron-pages"></pull-to-action>-->
+      <template is='dom-bind'>
+          <google-feeds feed='http://www.ivoox.com/feed_fg_f14151_filtro_1.xml' results='{{result}}'></google-feeds>
+      </template>
+
+      <paper-spinner id="spinner" active></paper-spinner>
+      <template is="dom-repeat" items="{{entries}}">
+        <mr-card
+           title="{{item.title}}"
+           description="{{item.description}}"
+           link="{{item.link}}"
+           date="{{item.date}}"
+           thumbnail="{{item.thumbnail}}">
+       </mr-card>
+      </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'mr-podcast',
+      behaviors: [FeedBehavior, StringBehavior],
+
+      _onFeedGetResults: function(data) {
+        //TODO check result xml because it includes info about refreshing feed
+
+        //(item.publishedDate) ?
+        //moment(item.publishedDate).fromNow() : undefined,
+        if ((((data || {}).detail || {}).feed || {}).entries) {
+          this.entries = data.detail.feed.entries.map(function(item) {
+            return {
+              title: item.title,
+              link: item.link,
+              date: item.publishedDate,
+              description: this.cleanString(item.contentSnippet),
+              thumbnail: this._parseThumbnail(item.content)
+            };
+          }, this);
+          this.$.spinner.active = false;
+        } else {
+          //TODO show an error message and retry button.
+        }
+      },
+
+      _parseThumbnail: function(data) {
+        var temp = null;
+        var frag = null;
+        var image = null;
+
+        if (data) {
+          //TODO change code for allows image of video too.
+          temp = document.createElement('div');
+          frag = document.createDocumentFragment();
+          temp.innerHTML = data;
+          frag.appendChild(temp);
+          image = (temp.getElementsByTagName('img')[0] || {}).src;
+          image = image || 'images/feed_default.jpg';
+        }
+        return image;
+      }
+    });
+  </script>
+</dom-module>

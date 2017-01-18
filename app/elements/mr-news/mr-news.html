@@ -1,0 +1,69 @@
+<dom-module id="mr-news">
+  <template>
+    <style>
+        paper-spinner {
+          bottom: 50%;
+          position: absolute;
+          left: 50%;
+        }
+      </style>
+
+<iron-ajax auto url="http://mariskalrock.com/index.php/feed/" handle-as="xml" on-response="handleResponse"></iron-ajax>
+
+
+<paper-spinner id="spinner" active></paper-spinner>
+<template is="dom-repeat" items="[[entries]]">
+  <mr-card title="[[item.title]]" description="[[item.description]]" link="[[item.link]]" date="[[item.date]]" thumbnail="[[item.thumbnail]]"></mr-card>
+</template>
+</template>
+
+<script>
+    Polymer({
+      is: 'mr-news',
+      behaviors: [FeedBehavior, StringBehavior],
+
+      handleResponse: function(data) {
+          //TODO check result xml because it includes info about refreshing feed
+          var response = data.detail.response;
+          var feed = response.querySelectorAll('channel')[0];
+          var items = feed.querySelectorAll('item');
+          var values = [];
+          var that = this;
+
+          if (items && items.length) {
+            items.forEach(function(item) {
+              values.push({
+                title: item.querySelector('title').innerHTML,
+                link: item.querySelector('link').innerHTML,
+                date: (item.querySelector('pubDate').innerHTML) ? 
+                moment(item.querySelector('pubDate').innerHTML).fromNow() : undefined,
+                description: that.cleanString(item.querySelector('description').innerHTML),
+                thumbnail: that._parseThumbnail(undefined)
+              });
+            });
+            this.entries = values;
+            this.$.spinner.active = false;
+          } else {
+            //FIXME show an error message and retry button.
+          }
+        },
+
+      _parseThumbnail: function(data) {
+        var temp = null;
+        var frag = null;
+        var image = null;
+
+        if (data) {
+          //TODO change code for allows image of video too.
+          temp = document.createElement('div');
+          frag = document.createDocumentFragment();
+          temp.innerHTML = data;
+          frag.appendChild(temp);
+          image = (temp.getElementsByTagName('img')[0] || {}).src;
+          image = image || 'images/feed_default.jpg';
+        }
+        return image;
+      }
+    });
+  </script>
+</dom-module>

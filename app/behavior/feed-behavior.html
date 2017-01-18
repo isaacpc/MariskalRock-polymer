@@ -1,0 +1,30 @@
+<script>
+   FeedBehavior = {
+      properties: {
+        result: {
+          type: Object
+        },
+        feedResult: {
+          type: Object
+        },
+        entries: Array
+      },
+      listeners: {
+        'event-google-feeds-error': '_onFeedError',
+        'google-feeds-response': '_onFeedGetResults',
+        'response': 'onPullRefresh'
+      },
+
+      /**
+       * Default parseResultsFunction
+       * @param  {[type]} data [description]
+       * @return {[type]}      [description]
+       */
+      _onFeedGetResults: function(data) {
+        this.entries = data.detail.feed.entries;
+      },
+      _onFeedError: function(response) {
+        console.log('Error retrieving feed data: ' + response);
+      }
+    };
+</script>

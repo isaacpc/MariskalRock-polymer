@@ -1,0 +1,25 @@
+# temp files
+.DS_Store
+.tmp
+
+# npm & bower
+node_modules
+bower_components
+
+# cordova
+#/platforms/
+#/plugins/
+#/res/*/current/
+platforms/android/assets/www/
+platforms/android/.gradle
+platforms/android/assets
+platforms/
+plugins/
+
+# build folder
+/www/
+.publish/
+/elements
+/behavior
+/images
+/styles

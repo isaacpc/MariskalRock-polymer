@@ -1,0 +1,59 @@
+
+<dom-module id="mr-tv">
+  <template>
+        <style>
+          paper-spinner {
+            bottom: 50%;
+            position: absolute;
+            left: 50%;
+          }
+        </style>
+
+        <pull-to-action action="location.reload()" container="iron-pages"></pull-to-action>
+        <template is='dom-bind'>
+            <google-feeds feed='https://www.youtube.com/feeds/videos.xml?channel_id=UC6epAxOHZ8WjTmjPmHQo-kQ' results='{{result}}'></google-feeds>
+        </template>
+
+        <paper-spinner id="spinner" active></paper-spinner>
+        <template is="dom-repeat" items="{{entries}}">
+          <mr-card
+             title="{{item.title}}"
+             description="{{item.description}}"
+             link="{{item.link}}"
+             date="{{item.date}}"
+             thumbnail="{{item.thumbnail}}">
+         </mr-card>
+        </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'mr-tv',
+      behaviors: [FeedBehavior, StringBehavior],
+      _onFeedGetResults: function(data) {
+        //TODO check result xml because it includes info about refreshing feed
+
+        if ((((data || {}).detail || {}).feed || {}).entries) {
+          this.entries = data.detail.feed.entries.map(function(item) {
+            return {
+              title: item.title,
+              link: item.link,
+              description: item.mediaGroups[0].contents[0].description,
+              date: (item.publishedDate) ? moment(item.publishedDate).fromNow() : undefined,
+              thumbnail: this._parseThumbnail(item.mediaGroups[0].contents[0].thumbnails[0].url)
+            };
+          }, this);
+          this.$.spinner.active = false;
+
+        } else {
+          //TODO show an error message and retry button.
+        }
+
+      },
+
+      _parseThumbnail: function(image) {
+        return image || 'images/feed_default.jpg';
+      }
+    });
+  </script>
+</dom-module>

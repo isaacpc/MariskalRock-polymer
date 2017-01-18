@@ -1,0 +1,137 @@
+
+<dom-module id="mr-card">
+  <template>
+  <style>
+      :host {
+        display: block;
+        margin:14px;
+      }
+
+      paper-card { @apply(--layout-horizontal); }
+
+      paper-card .card-content {
+        padding: 10px;
+      }
+
+      paper-card .card-actions {
+          text-align:right;
+      }
+
+      .text-content {
+         @apply(--layout-flex);
+         float: right;
+      }
+      .title {
+        @apply(--paper-font-headline);
+        font-size: 16px;
+        line-height: 18px;
+        margin-bottom: 10px;
+      }
+
+      .date {
+        color: var(--paper-grey-600); margin: 10px 0;
+        font-size: 11px;
+      }
+
+      .description {
+        display: block;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        overflow: hidden;
+        max-height: 3.6em;
+        font-size:12px;
+      }
+
+      .thumbnail {
+        width:100px;
+        margin: 10px;
+      }
+    iron-image {
+      --iron-image-width: 100%;
+    }
+
+  </style>
+
+      <paper-card>
+        <iron-image width="100%" class="thumbnail" src="{{thumbnail}}"></iron-image>
+        <div class="text-content">
+          <div class="card-content">
+            <div class="title">{{title}}</div>
+            <div class="description">{{description}}</div>
+            <div class="date">{{date}}</div>
+          </div>
+          <div class="card-actions">
+            <paper-icon-button icon="image:remove-red-eye" on-tap="_goToLink"></paper-icon-button>
+            <template is="dom-if" if="{{hasSharePlugin}}">
+              <paper-icon-button icon="social:share" on-tap="_shareContent"></paper-icon-button>
+            </template>
+          </div>
+        </div>
+    </paper-card>
+</template>
+
+  <script>
+      Polymer({
+        is: 'mr-card',
+        properties: {
+          title: {
+            type: String
+          },
+
+          description: {
+            type: String
+          },
+
+          date: {
+            type: String
+          },
+
+          link: {
+            type: String
+          },
+
+          thumbnail: {
+            type: String
+          },
+
+          hasSharePlugin: {
+            type: Boolean,
+            value: function() {
+              return (window.plugins || {}).socialsharing;
+            }
+          }
+
+        },
+
+        _goToLink: function() {
+          window.open(this.link,'_blank');
+        },
+
+        _shareContent: function() {
+          var options = {
+            message: 'share this',
+            subject: 'the subject',
+            url: this.link,
+            chooserTitle: 'Compartir'
+          };
+
+          window.plugins.socialsharing.shareWithOptions(options,
+            this._onShareSuccess,
+            this._onShareError);
+        },
+
+        _onShareSuccess: function(result) {
+          console.log('Share completed? ' + result.completed);
+          // On Android apps mostly return false even while it's true
+          console.log('Shared to app: ' + result.app);
+          //On Android result.app is currently empty.
+          //On iOS it's empty when sharing is cancelled (result.completed=false)
+        },
+
+        _onShareError: function(msg) {
+          console.log('Sharing failed with message: ' + msg);
+        }
+
+      });
+  </script>
+</dom-module>

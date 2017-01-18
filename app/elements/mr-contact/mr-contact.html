@@ -1,0 +1,118 @@
+
+<dom-module id="mr-contact">
+  <link rel="import" href="../../styles/technology/technology.css" type="css">
+  <template>
+  <style>
+    paper-item iron-icon {
+      margin-right: 20px;
+    }
+
+    paper-item {
+      margin-bottom: 20px;
+    }
+
+    paper-button {
+      margin-top: 6px;
+      margin-right: 10px;
+    }
+
+    paper-button.twitter {
+      background-color: var(--paper-light-blue-500);
+      color: white;
+    }
+
+    paper-button.facebook {
+      background-color: var(--paper-blue-800);
+      color: white;
+    }
+
+    paper-button.youtube {
+      background-color: var(--paper-red-900);
+      color: white;
+    }
+    
+    .social-links {
+      display:flex;
+       justify-content: space-between;
+    }
+
+  </style>
+  <section class="info">
+    <h3>Contacto</h3>
+    <paper-item>
+      <iron-icon icon="mail"></iron-icon>
+      <paper-item-body two-line>
+        <div>Redacción/Radio/Tv/Publicidad:</div>
+        <div secondary><a href="mailto:radio@mariskalrock.com">radio@mariskalrock.com</a></div>
+      </paper-item-body>
+    </paper-item>
+
+    <paper-item>
+      <iron-icon icon="mail"></iron-icon>
+      <paper-item-body two-line>
+        <div>Correspondencia:</div>
+        <div secondary>Correo Terrestre: Apdo. Correos 2597 - 28080 Madrid (España)</div>
+      </paper-item-body>
+    </paper-item>
+
+    <paper-item>
+      <iron-icon icon="help"></iron-icon>
+      <paper-item-body two-line>
+        <div>Incidencias y sugerencias web:</div>
+        <div secondary><a href="mailto:web@mariskalrock.com">web@mariskalrock.com</a></div>
+      </paper-item-body>
+    </paper-item>
+
+    <paper-item>
+      <iron-icon icon="copyright"></iron-icon>
+      <paper-item-body two-line>
+        <div>Copyright 1997 - 2017 MariskalRock.com</div>
+        <div secondary>Todos los derechos reservados</div>
+      </paper-item-body>
+    </paper-item>
+  </section>
+
+  <section class="social-network">
+    <h3>Redes Sociales</h3>
+    <paper-item>
+      <paper-item-body two-line>
+        <div>Siguenos en las redes sociales:</div>
+        <div secondary>
+          <div class="social-links">
+            <a href="https://www.facebook.com/mariskalrock/" target="_blank"><paper-button raised class="facebook">Facebook</paper-button></a>
+            <a href="https://twitter.com/mariskalrock" target="_blank"><paper-button raised class="twitter">Twitter</paper-button></a>
+            <a href="https://www.youtube.com/user/MariskalRockTV" target="_blank"><paper-button raised class="youtube">Youtube</paper-button></a>
+          </div> 
+        </div>
+      </paper-item-body>
+    </paper-item>
+  </section>
+
+  <section class="info">
+    <h3>Sobre la Aplicación</h3>
+    <paper-item>
+      <iron-icon icon="polymer"></iron-icon>
+      <paper-item-body two-line>
+        <div>Desarrollado por:</div>
+        <div secondary><a href="mailto:palo.isaac@gmail.com">Isaac Palón</a></div>
+      </paper-item-body>
+    </paper-item>
+    <paper-item>
+      <iron-icon icon="build"></iron-icon>
+      <paper-item-body two-line>
+        <div>Versión:</div>
+        <div secondary>4.0</div>
+      </paper-item-body>
+    </paper-item>
+  </section>
+</template>
+
+<script>
+Polymer({
+  is: 'mr-contact',
+  properties: {
+
+  }
+});
+</script>
+</dom-module>
