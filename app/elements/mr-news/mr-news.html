@@ -8,13 +8,12 @@
         }
       </style>
 
-<iron-ajax auto url="http://mariskalrock.com/index.php/feed/" handle-as="xml" on-response="handleResponse"></iron-ajax>
+  <iron-ajax auto url="http://mariskalrock.com/index.php/feed/" handle-as="xml" on-response="handleResponse"></iron-ajax>
 
-
-<paper-spinner id="spinner" active></paper-spinner>
-<template is="dom-repeat" items="[[entries]]">
-  <mr-card title="[[item.title]]" description="[[item.description]]" link="[[item.link]]" date="[[item.date]]" thumbnail="[[item.thumbnail]]"></mr-card>
-</template>
+  <paper-spinner id="spinner" active></paper-spinner>
+  <template is="dom-repeat" items="[[entries]]">
+    <mr-card title="[[item.title]]" description="[[item.description]]" link="[[item.link]]" date="[[item.date]]" thumbnail="[[item.thumbnail]]"></mr-card>
+  </template>
 </template>
 
 <script>
@@ -24,7 +23,7 @@
 
       handleResponse: function(data) {
           //TODO check result xml because it includes info about refreshing feed
-          var response = data.detail.response;
+          var response = data.detail.xhr.responseXML;
           var feed = response.querySelectorAll('channel')[0];
           var items = feed.querySelectorAll('item');
           var values = [];
@@ -33,12 +32,12 @@
           if (items && items.length) {
             items.forEach(function(item) {
               values.push({
-                title: item.querySelector('title').innerHTML,
-                link: item.querySelector('link').innerHTML,
-                date: (item.querySelector('pubDate').innerHTML) ? 
-                moment(item.querySelector('pubDate').innerHTML).fromNow() : undefined,
-                description: that.cleanString(item.querySelector('description').innerHTML),
-                thumbnail: that._parseThumbnail(undefined)
+                title: item.querySelector('title').textContent,
+                link: item.querySelector('link').textContent,
+                date: (item.querySelector('pubDate').textContent) ? 
+                moment(item.querySelector('pubDate').textContent).fromNow() : undefined,
+                description: that.cleanString(item.querySelector('description').textContent),
+                thumbnail: that._parseThumbnail(item.querySelector('encoded'))
               });
             });
             this.entries = values;
@@ -51,18 +50,19 @@
       _parseThumbnail: function(data) {
         var temp = null;
         var frag = null;
-        var image = null;
+        var image;
 
         if (data) {
           //TODO change code for allows image of video too.
+          //FIXME optimize method.
           temp = document.createElement('div');
           frag = document.createDocumentFragment();
-          temp.innerHTML = data;
+          temp.innerHTML = data.innerHTML;
           frag.appendChild(temp);
           image = (temp.getElementsByTagName('img')[0] || {}).src;
-          image = image || 'images/feed_default.jpg';
         }
-        return image;
+
+        return image || 'images/feed_default.jpg';
       }
     });
   </script>
